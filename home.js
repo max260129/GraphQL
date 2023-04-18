@@ -7,7 +7,6 @@ const password = localStorage.getItem('password');
 
 // Afficher le nom d'utilisateur ou l'adresse e-mail dans la page
 document.getElementById('username').textContent = username || email;
-document.getElementById('password').textContent = password;
 
 
 // ----------------------------------
