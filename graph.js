@@ -79,6 +79,9 @@ const requestOptions = {
           xps {
             amount
             path
+            event {
+              endAt
+            }
           }
         }
       }
@@ -152,24 +155,120 @@ fetch('https://zone01normandie.org/api/graphql-engine/v1/graphql', requestOption
     total = Math.round(total)
     //console.log(total)
 
-    
+    // First Graphic
+
+    var data = [
+        // ...
+    ];
+
+    for(let i = 0; i < xps.length; i++) {
+
+      let nbm = xps[i].amount;
+
+      let path = xps[i].path;
+      let dernierSlash = path.lastIndexOf("/");
+
+      if (dernierSlash !== -1) {
+        let nouvelleChaine = path.substring(dernierSlash + 1);
+        var newelem = { exercice: nouvelleChaine, points: nbm }
+        
+      }
+
+      data.push(newelem)
+       // console.log(path)
+
+    }
+
+    $(document).ready(function() {
+      
+        // Extraire les noms des exercices et les points dans des tableaux distincts
+        var exercices = data.map(function(item) {
+          return item.exercice;
+        });
+      
+        var points = data.map(function(item) {
+          return item.points;
+        });
+      
+        // Créer le graphique avec Chart.js
+        var ct = document.getElementById('myChart1').getContext('2d');
+        var myChart = new Chart(ct, {
+          type: 'bar',
+          data: {
+            labels: exercices,
+            datasets: [{
+              label: 'Points XP',
+              data: points,
+              backgroundColor: 'rgba(0, 123, 255, 0.5)'
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+      
+    // End of first Graphic
+
+    // Second Graphic
+
+    second(data)
+  
+    // End of second graphic
 
 
+  }
 
+  function second(data) {
 
-    // Print info
-    document.getElementById('lastname').textContent = lastName;
-    document.getElementById('name').textContent = name ;
-    document.getElementById('campus').textContent = campus ;
-    document.getElementById('email').textContent = email ;
-    document.getElementById('tel').textContent = tel;
-    document.getElementById('addresse').textContent = addresse;
-    document.getElementById('city').textContent = city;
+    // Données des nuages de points
+    var data = [
+      { x: '2023-01-01', y: 5 },
+      { x: '2023-02-01', y: 10 },
+      { x: '2023-03-01', y: 8 },
+      { x: '2023-04-01', y: 15 },
+      { x: '2023-05-01', y: 12 }
+    ];
 
-    ratio = parseFloat(ratio.toFixed(1));
-    document.getElementById('ratio').textContent = ratio;
+    // Conversion des dates en objets Date
+    data.forEach(function(point) {
+      point.x = new Date(point.x);
+    });
 
-    document.getElementById('xp').textContent = total;
+    // Création du graphique
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Nuages de points',
+          data: data,
+          borderColor: 'blue',
+          backgroundColor: 'lightblue',
+          fill: false
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'month'
+            },
+            ticks: {
+              source: 'data'
+            }
+          },
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
 
 
   }
