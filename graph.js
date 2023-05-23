@@ -70,6 +70,11 @@ const requestOptions = {
     query: `
       {
         user {
+          transactions {
+            type
+            amount
+            createdAt
+          }
           auditRatio
           attrs
           firstName
@@ -113,6 +118,7 @@ fetch('https://zone01normandie.org/api/graphql-engine/v1/graphql', requestOption
     var tel = data.data.user[0].attrs.Phone;
     var addresse = data.data.user[0].attrs.addressStreet;
     var city = data.data.user[0].attrs.addressCity;
+    var transaction = data.data.user[0].transactions;
 
     var ratio = data.data.user[0].auditRatio;
 
@@ -216,64 +222,93 @@ fetch('https://zone01normandie.org/api/graphql-engine/v1/graphql', requestOption
 
     // Second Graphic
 
-    second(data)
+    var data2 = [
+      //{ date: '2023-01-01', xp: 100 },
+    ];
+
+    var date = [];
+
+    for(let i = 0; i < transaction.length; i++) {
+
+      var actual = transaction[i]
+      
+      let date = actual.createdAt.substring(0, 10);
+      let heure = actual.createdAt.substring(11,16)
+
+      if (actual.type == "xp") {
+          data2.push(actual)
+      }
+
+    }
+
+    // Trier par ordre croissant
+    data2.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+    // Delet Type
+    data2 = data2.map(({ type, ...rest }) => rest);
+    // Rename  Amount and createdAt
+    data2 = data2.map(({ amount, ...rest }) => ({ xp: amount, ...rest }));
+    data2 = data2.map(({ createdAt, ...rest }) => ({ date: createdAt, ...rest }));
+
+    for(let i = 0; i < data2.length; i++) {
+
+      var y = (i - 1)
+  
+      if (i != 0) {
+        var precedxp = data2[y].xp;
+
+        var Total = precedxp + data2[i].xp;
+
+        data2[i].xp = Total
+      }
+    }
+
+    // Clean la Date
+    data2 = data2.map(({ xp, date }) => ({
+      xp: xp,
+      date: date.split('T')[0]
+    }));
+
+    console.log(data2)
+
+    $(document).ready(function() {
+
+      // Extraire les dates et les points XP dans des tableaux distincts
+      var dates = data2.map(function(item) {
+        return item.date;
+      });
+    
+      var xpValues = data2.map(function(item) {
+        return item.xp;
+      });
+    
+      // Créer le deuxième graphique avec Chart.js
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart2 = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'XP dans le temps',
+            data: xpValues,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
   
     // End of second graphic
 
 
   }
-
-  function second(data) {
-
-    // Données des nuages de points
-    var data = [
-      { x: '2023-01-01', y: 5 },
-      { x: '2023-02-01', y: 10 },
-      { x: '2023-03-01', y: 8 },
-      { x: '2023-04-01', y: 15 },
-      { x: '2023-05-01', y: 12 }
-    ];
-
-    // Conversion des dates en objets Date
-    data.forEach(function(point) {
-      point.x = new Date(point.x);
-    });
-
-    // Création du graphique
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        datasets: [{
-          label: 'Nuages de points',
-          data: data,
-          borderColor: 'blue',
-          backgroundColor: 'lightblue',
-          fill: false
-        }]
-      },
-      options: {
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'month'
-            },
-            ticks: {
-              source: 'data'
-            }
-          },
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-
-
-  }
-
-
 
   //- -----------------------------------------------------------
 
